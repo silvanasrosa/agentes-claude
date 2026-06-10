@@ -1,0 +1,27 @@
+/* Design System — Silvana Rosa (@eu.silvanarosa)
+   Tokens oficiais. Importe em qualquer carrossel/HTML. */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@400;500;600&display=swap');
+
+:root {
+  /* Cores */
+  --tiffany:       #4EC8C4;
+  --tiffany-light: #A8E2DF;
+  --teal-deep:     #0E4D4A;
+  --teal-mid:      #1A6B66;
+  --cream:         #F7F1E5;
+  --cream-border:  #E8DEC9;
+  --gold:          #C8A24C;
+  --ink:           #10302E;
+
+  /* Gradiente da marca */
+  --brand-gradient: linear-gradient(165deg, #0E4D4A 0%, #1A6B66 55%, #4EC8C4 100%);
+
+  /* Tipografia */
+  --font-display: 'Playfair Display', serif;
+  --font-body:    'DM Sans', sans-serif;
+}
+
+.serif { font-family: var(--font-display); }
+.sans  { font-family: var(--font-body); }
+.italic-gold { font-family: var(--font-display); font-style: italic; color: var(--gold); }

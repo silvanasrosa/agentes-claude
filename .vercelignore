@@ -1,0 +1,8 @@
+# NUNCA publicar credenciais nem scripts na web
+.env
+*.env
+.env.*
+scripts/
+brand/
+carousel_agentes.html
+*.py

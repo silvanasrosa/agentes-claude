@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Carrossel — Agentes Claude | Silvana Rosa</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@400;500;600&display=swap');
+:root{
+  --tiffany:#4EC8C4; --tiffany-light:#A8E2DF; --teal-deep:#0E4D4A; --teal-mid:#1A6B66;
+  --cream:#F7F1E5; --cream-border:#E8DEC9; --gold:#C8A24C; --ink:#10302E;
+  --grad:linear-gradient(165deg,#0E4D4A 0%,#1A6B66 55%,#4EC8C4 100%);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#d8d3c8;display:flex;justify-content:center;padding:30px;font-family:'DM Sans',sans-serif;}
+.serif{font-family:'Playfair Display',serif;}
+.sans{font-family:'DM Sans',sans-serif;}
+.ig-frame{width:420px;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.25);}
+.ig-header{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid #eee;}
+.ig-header .av{width:34px;height:34px;border-radius:50%;background:var(--teal-deep);display:flex;align-items:center;justify-content:center;color:var(--tiffany);font-family:'Playfair Display',serif;font-size:16px;}
+.ig-header .hd{font-size:13px;font-weight:600;color:#222;}
+.ig-header .hd small{display:block;font-weight:400;color:#999;font-size:11px;}
+.carousel-viewport{width:420px;height:525px;overflow:hidden;position:relative;cursor:grab;}
+.carousel-track{display:flex;height:100%;transition:transform .35s ease;}
+.slide{min-width:420px;height:525px;position:relative;overflow:hidden;}
+.pad{position:absolute;inset:0;padding:40px 36px 64px;display:flex;flex-direction:column;}
+.tag{font-size:10px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;}
+.ig-dots{display:flex;gap:5px;justify-content:center;padding:12px;}
+.ig-dots i{width:6px;height:6px;border-radius:50%;background:#ccc;}
+.ig-dots i.on{background:var(--teal-deep);}
+.ig-actions{display:flex;gap:16px;padding:6px 14px 4px;font-size:20px;}
+.ig-caption{padding:4px 14px 16px;font-size:12px;color:#333;line-height:1.5;}
+.wm{position:absolute;font-family:'Playfair Display',serif;font-size:230px;line-height:1;opacity:.06;right:-10px;bottom:-40px;font-weight:600;}
+</style>
+</head>
+<body>
+<div class="ig-frame">
+  <div class="ig-header">
+    <div class="av serif">S</div>
+    <div class="hd">eu.silvanarosa<small>Mentora de Negócios</small></div>
+  </div>
+  <div class="carousel-viewport">
+    <div class="carousel-track" id="track"></div>
+  </div>
+  <div class="ig-dots" id="dots"></div>
+  <div class="ig-actions"><span>♡</span><span>💬</span><span>↪</span><span style="margin-left:auto">🔖</span></div>
+  <div class="ig-caption"><b>eu.silvanarosa</b> Seu ecossistema de Agentes Claude — feito com a sua alma. 🤍 Comenta <b>AGENTES</b> 💌</div>
+</div>
+
+<script>
+const AGENTS = [
+  {n:"01",icon:"🧭",t:"Orquestradora da Jornada",d:"Mapeia os passos da sua entrega e organiza o seu método.",o:"Sua mentoria vira um caminho claro, estruturado e vendável."},
+  {n:"02",icon:"💎",t:"Guardiã do Posicionamento",d:"Traduz a sua visão em presença magnética e mensagem única.",o:"Você sai da confusão e entra no magnetismo."},
+  {n:"03",icon:"🌀",t:"Vendedora da Transformação",d:"Cria mensagens de venda com a alma da sua entrega.",o:"Você vende com integridade — sem sentir que está empurrando."},
+  {n:"04",icon:"🌿",t:"Estrategista de Lançamentos",d:"Gera estratégias de venda alinhadas ao seu ritmo e ao seu negócio.",o:"Você vende com consistência, sem se desgastar."},
+  {n:"05",icon:"📣",t:"Copy da Mentora Magnética",d:"Escreve posts, páginas e e-mails com o seu tom de voz.",o:"Comunicação autêntica que conecta, converte e encanta."},
+  {n:"06",icon:"🎯",t:"Simuladora de Sessões",d:"Testa abordagens e roteiros com você antes das mentorias.",o:"Você chega mais preparada, confiante e fluida."},
+  {n:"07",icon:"📬",t:"Reativadora de Leads",d:"Reengaja quem já te conhece — mas ainda não comprou.",o:"Você ativa vendas adormecidas com sutileza e estratégia."},
+  {n:"08",icon:"📝",t:"Nomes & Posicionamento de Ofertas",d:"Gera nomes com alma e impacto para os seus produtos.",o:"Suas ofertas ficam memoráveis e mais fáceis de vender."},
+  {n:"09",icon:"📲",t:"Geradora de Conteúdo do Método",d:"Transforma o seu conhecimento em conteúdo estratégico.",o:"Você nutre a audiência com propósito — sem tela em branco."},
+  {n:"10",icon:"🤖",t:"FAQ & Gestão de Objeções",d:"Responde dúvidas e objeções na sua linguagem e nas suas ofertas.",o:"Menos desgaste no atendimento, mais conversão."},
+];
+const TOTAL = AGENTS.length + 2;
+
+function progress(i,light){
+  const pct=((i+1)/TOTAL)*100;
+  const track=light?'rgba(16,48,46,.10)':'rgba(255,255,255,.15)';
+  const fill=light?'#4EC8C4':'#A8E2DF';
+  const lab=light?'rgba(16,48,46,.4)':'rgba(255,255,255,.5)';
+  return `<div style="position:absolute;bottom:0;left:0;right:0;padding:16px 36px 22px;display:flex;align-items:center;gap:10px;z-index:10">
+    <div style="flex:1;height:3px;background:${track};border-radius:2px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${fill};border-radius:2px"></div></div>
+    <span style="font-size:11px;color:${lab};font-weight:500">${i+1}/${TOTAL}</span></div>`;
+}
+function arrow(light){
+  if(false)return'';
+  const bg=light?'rgba(16,48,46,.05)':'rgba(255,255,255,.07)';
+  const st=light?'rgba(16,48,46,.3)':'rgba(255,255,255,.4)';
+  return `<div style="position:absolute;right:0;top:0;bottom:0;width:44px;display:flex;align-items:center;justify-content:center;background:linear-gradient(to right,transparent,${bg});z-index:9">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="${st}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>`;
+}
+
+let html="";
+
+// SLIDE 1 — CAPA (creme)
+html += `<div class="slide" style="background:var(--cream)">
+  <div class="wm" style="color:var(--teal-deep)">IA</div>
+  <div class="pad" style="justify-content:center">
+    <span class="tag sans" style="color:var(--tiffany);margin-bottom:18px">✦ ECOSSISTEMA DE IA · SILVANA ROSA</span>
+    <h1 class="serif" style="font-size:38px;line-height:1.12;color:var(--ink);font-weight:600">Se você é <span class="serif" style="font-style:italic;color:var(--gold)">mentora</span>…</h1>
+    <p class="serif" style="font-size:24px;line-height:1.25;color:var(--teal-deep);margin-top:14px;font-weight:500">esse poderia ser o seu ecossistema de IAs.</p>
+    <p class="sans" style="font-size:14px;color:#5b6b69;margin-top:20px;line-height:1.6;max-width:300px">Não robôs genéricos. <b style="color:var(--teal-deep)">Agentes com a sua alma</b> — criados sob medida, rodando direto no Claude, com a sua linguagem e o seu método.</p>
+  </div>${arrow(true)}${progress(0,true)}</div>`;
+
+// SLIDES 2..11 — AGENTES
+AGENTS.forEach((a,idx)=>{
+  const i=idx+1;
+  const light=(i%2===1); // alterna
+  const bg=light?'var(--cream)':'var(--teal-deep)';
+  const titleColor=light?'var(--ink)':'#fff';
+  const descColor=light?'#5b6b69':'rgba(255,255,255,.72)';
+  const tagColor=light?'var(--tiffany)':'var(--tiffany-light)';
+  const numColor=light?'rgba(16,48,46,.10)':'rgba(168,226,223,.14)';
+  const outBg=light?'rgba(78,200,196,.12)':'rgba(168,226,223,.10)';
+  const outColor=light?'var(--teal-deep)':'var(--tiffany-light)';
+  html += `<div class="slide" style="background:${bg}">
+    <div class="wm serif" style="color:${numColor}">${a.n}</div>
+    <div class="pad" style="justify-content:flex-end">
+      <span class="tag sans" style="color:${tagColor};margin-bottom:14px">AGENTE ${a.n}</span>
+      <div style="font-size:34px;margin-bottom:10px">${a.icon}</div>
+      <h2 class="serif" style="font-size:30px;line-height:1.14;color:${titleColor};font-weight:600;margin-bottom:12px">${a.t}</h2>
+      <p class="sans" style="font-size:14.5px;line-height:1.55;color:${descColor};max-width:320px;margin-bottom:16px">${a.d}</p>
+      <div style="display:inline-flex;align-self:flex-start;align-items:center;gap:8px;background:${outBg};padding:10px 16px;border-radius:14px;max-width:330px">
+        <span class="sans" style="font-size:13.5px;line-height:1.4;color:${outColor};font-weight:500">${a.o}</span>
+      </div>
+    </div>${arrow(light)}${progress(i,light)}</div>`;
+});
+
+// SLIDE FINAL — CTA (gradiente)
+html += `<div class="slide" style="background:var(--grad)">
+  <div class="pad" style="justify-content:center;align-items:flex-start">
+    <span class="tag sans" style="color:rgba(255,255,255,.7);margin-bottom:18px">✦ VAMOS JUNTAS</span>
+    <h2 class="serif" style="font-size:34px;line-height:1.18;color:#fff;font-weight:600">Um time de <span class="serif" style="font-style:italic;color:#F7F1E5">Agentes Claude</span><br>que trabalha com você<br>e por você.</h2>
+    <p class="sans" style="font-size:14.5px;color:rgba(255,255,255,.82);margin-top:18px;line-height:1.6;max-width:310px">Cada agente reflete o seu método, fala como você fala e entrega como você entrega.</p>
+    <div style="margin-top:26px;display:inline-flex;align-items:center;gap:9px;background:var(--cream);color:var(--teal-deep);padding:13px 26px;border-radius:30px;font-weight:600;font-size:14px" class="sans">💌 Comenta a palavra AGENTES</div>
+    <p class="sans" style="font-size:12px;color:rgba(255,255,255,.65);margin-top:18px">@eu.silvanarosa</p>
+  </div>${progress(TOTAL-1,false)}</div>`;
+
+document.getElementById('track').innerHTML=html;
+
+// dots
+let dh="";for(let i=0;i<TOTAL;i++)dh+=`<i class="${i===0?'on':''}"></i>`;
+document.getElementById('dots').innerHTML=dh;
+
+// swipe/drag
+let idx=0,startX=0,drag=false;
+const track=document.getElementById('track');
+const vp=document.querySelector('.carousel-viewport');
+function go(i){idx=Math.max(0,Math.min(TOTAL-1,i));track.style.transform=`translateX(${-idx*420}px)`;
+  document.querySelectorAll('.ig-dots i').forEach((d,j)=>d.classList.toggle('on',j===idx));}
+vp.addEventListener('mousedown',e=>{drag=true;startX=e.clientX;track.style.transition='none';});
+window.addEventListener('mouseup',e=>{if(!drag)return;drag=false;track.style.transition='transform .35s ease';
+  const dx=e.clientX-startX;if(dx<-50)go(idx+1);else if(dx>50)go(idx-1);else go(idx);});
+vp.addEventListener('click',e=>{const r=vp.getBoundingClientRect();if(e.clientX-r.left>r.width/2)go(idx+1);else go(idx-1);});
+</script>
+</body>
+</html>
