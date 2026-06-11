@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Carrossel - Agentes Claude | Preview</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=DM+Sans:wght@400;500;600&display=swap");
+
+    :root {
+      --tiffany: #4EC8C4;
+      --teal-deep: #0E4D4A;
+      --cream: #F7F1E5;
+      --cream-border: #E8DEC9;
+      --ink: #10302E;
+      --rose: #ff315d;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 38px 18px;
+      background: #d8d3c8;
+      color: var(--ink);
+      font-family: "DM Sans", sans-serif;
+      border-top: 8px solid #51352e;
+    }
+
+    .ig-frame {
+      width: min(420px, calc(100vw - 36px));
+      align-self: flex-start;
+      overflow: hidden;
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: 0 20px 52px rgba(16, 48, 46, 0.22);
+    }
+
+    .ig-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border-bottom: 1px solid #eee;
+      background: #fff;
+    }
+
+    .avatar {
+      width: 34px;
+      height: 34px;
+      flex: 0 0 34px;
+      overflow: hidden;
+      border: 2px solid var(--teal-deep);
+      border-radius: 50%;
+      background: var(--teal-deep);
+    }
+
+    .avatar img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .profile {
+      min-width: 0;
+    }
+
+    .profile strong {
+      display: block;
+      color: #161616;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.15;
+    }
+
+    .profile small {
+      display: block;
+      margin-top: 2px;
+      color: #888;
+      font-size: 11px;
+      line-height: 1.15;
+    }
+
+    .carousel-viewport {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4 / 5;
+      overflow: hidden;
+      background: var(--cream);
+      cursor: grab;
+    }
+
+    .carousel-viewport:active {
+      cursor: grabbing;
+    }
+
+    .carousel-track {
+      display: flex;
+      height: 100%;
+      transition: transform 260ms ease;
+      will-change: transform;
+    }
+
+    .slide {
+      min-width: 100%;
+      height: 100%;
+      background: var(--cream);
+    }
+
+    .slide img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .nav {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      z-index: 2;
+      width: 58px;
+      border: 0;
+      background: transparent;
+      color: rgba(16, 48, 46, 0.32);
+      cursor: pointer;
+      font-size: 42px;
+      line-height: 1;
+    }
+
+    .nav.prev {
+      left: 0;
+      background: linear-gradient(to right, rgba(247, 241, 229, 0.32), transparent);
+    }
+
+    .nav.next {
+      right: 0;
+      background: linear-gradient(to left, rgba(247, 241, 229, 0.32), transparent);
+    }
+
+    .nav:disabled {
+      cursor: default;
+      opacity: 0.12;
+    }
+
+    .ig-dots {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      padding: 11px 14px 8px;
+      background: #fff;
+    }
+
+    .ig-dots button {
+      width: 6px;
+      height: 6px;
+      border: 0;
+      border-radius: 50%;
+      background: #ccc;
+      cursor: pointer;
+    }
+
+    .ig-dots button.active {
+      width: 7px;
+      height: 7px;
+      background: var(--teal-deep);
+    }
+
+    .ig-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 6px 14px 4px;
+      background: #fff;
+      color: #111;
+    }
+
+    .ig-actions button {
+      display: inline-grid;
+      place-items: center;
+      width: 22px;
+      height: 22px;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      cursor: pointer;
+      font-size: 21px;
+      line-height: 1;
+    }
+
+    .ig-actions .save {
+      margin-left: auto;
+      color: var(--rose);
+    }
+
+    .ig-caption {
+      padding: 4px 14px 16px;
+      background: #fff;
+      color: #222;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .ig-caption b {
+      font-weight: 700;
+    }
+
+    .ig-caption .tag {
+      color: var(--teal-deep);
+      font-weight: 700;
+    }
+
+    .empty {
+      display: grid;
+      place-items: center;
+      height: 100%;
+      padding: 24px;
+      color: rgba(16, 48, 46, 0.68);
+      text-align: center;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+  </style>
+</head>
+<body>
+  <article class="ig-frame" aria-label="Preview do carrossel no Instagram">
+    <header class="ig-header">
+      <div class="avatar">
+        <img src="minhas-fotos/bio-silvana-rosa-desafio-sua-mentoria-em-3-dias.webp" alt="Foto de perfil de Silvana Rosa">
+      </div>
+      <div class="profile">
+        <strong>eu.silvanarosa</strong>
+        <small>Mentora de Negocios</small>
+      </div>
+    </header>
+
+    <section class="carousel-viewport" id="viewport">
+      <div class="carousel-track" id="track"></div>
+      <button class="nav prev" type="button" id="prev" aria-label="Slide anterior">&lsaquo;</button>
+      <button class="nav next" type="button" id="next" aria-label="Proximo slide">&rsaquo;</button>
+    </section>
+
+    <nav class="ig-dots" id="dots" aria-label="Navegacao dos slides"></nav>
+
+    <div class="ig-actions" aria-hidden="true">
+      <button type="button">♡</button>
+      <button type="button">💬</button>
+      <button type="button">↪</button>
+      <button class="save" type="button">▰</button>
+    </div>
+
+    <p class="ig-caption">
+      <b>eu.silvanarosa</b>
+      Seu ecossistema de Agentes Claude, feito com a sua alma.
+      <span class="tag">Comenta AGENTES</span> 💌
+    </p>
+  </article>
+
+  <script>
+    const slides = [
+      "carrosseis/agentes-claude/slide-01.png",
+      "carrosseis/agentes-claude/slide-02.png",
+      "carrosseis/agentes-claude/slide-03.png",
+      "carrosseis/agentes-claude/slide-04.png",
+      "carrosseis/agentes-claude/slide-05.png",
+      "carrosseis/agentes-claude/slide-06.png",
+      "carrosseis/agentes-claude/slide-07.png"
+    ];
+
+    const track = document.getElementById("track");
+    const dots = document.getElementById("dots");
+    const prev = document.getElementById("prev");
+    const next = document.getElementById("next");
+    const viewport = document.getElementById("viewport");
+    let current = 0;
+    let startX = 0;
+    let isDragging = false;
+
+    function mountSlides() {
+      if (!slides.length) {
+        track.innerHTML = '<div class="slide"><div class="empty">Nenhum slide encontrado em carrosseis/agentes-claude.</div></div>';
+        return;
+      }
+
+      slides.forEach((src, index) => {
+        const slide = document.createElement("div");
+        slide.className = "slide";
+
+        const img = document.createElement("img");
+        img.src = src;
+        img.alt = `Slide ${index + 1}`;
+
+        slide.appendChild(img);
+        track.appendChild(slide);
+
+        const dot = document.createElement("button");
+        dot.type = "button";
+        dot.setAttribute("aria-label", `Ir para slide ${index + 1}`);
+        dot.addEventListener("click", () => {
+          current = index;
+          render();
+        });
+        dots.appendChild(dot);
+      });
+    }
+
+    function render() {
+      track.style.transform = `translateX(${-current * 100}%)`;
+      [...dots.children].forEach((dot, index) => {
+        dot.classList.toggle("active", index === current);
+      });
+      prev.disabled = current === 0;
+      next.disabled = current === slides.length - 1;
+    }
+
+    function go(delta) {
+      current = Math.max(0, Math.min(slides.length - 1, current + delta));
+      render();
+    }
+
+    prev.addEventListener("click", () => go(-1));
+    next.addEventListener("click", () => go(1));
+
+    viewport.addEventListener("pointerdown", (event) => {
+      isDragging = true;
+      startX = event.clientX;
+      viewport.setPointerCapture(event.pointerId);
+    });
+
+    viewport.addEventListener("pointerup", (event) => {
+      if (!isDragging) return;
+      const distance = event.clientX - startX;
+      if (Math.abs(distance) > 45) {
+        go(distance < 0 ? 1 : -1);
+      }
+      isDragging = false;
+    });
+
+    mountSlides();
+    render();
+  </script>
+</body>
+</html>
