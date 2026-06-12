@@ -3,15 +3,19 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Preview Instagram - Agentes Claude</title>
+  <title>Vitrine de Carrosseis - Silvana Rosa</title>
   <style>
     :root {
-      --page: #d8d3c8;
-      --surface: #fff;
-      --line: #efefef;
-      --text: #111;
-      --muted: #737373;
-      --blue: #0095f6;
+      --page: #f4efe5;
+      --ink: #07393a;
+      --muted: #6f7772;
+      --surface: #fffdf8;
+      --line: #e5dccb;
+      --gold: #c49a45;
+      --teal: #27b8b4;
+      --posted: #0d6b52;
+      --approved: #8a6a16;
+      --pending: #0d5d73;
     }
 
     * {
@@ -22,457 +26,210 @@
 
     body {
       min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      padding: 38px 18px;
       background: var(--page);
-      color: var(--text);
+      color: var(--ink);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
 
-    .post {
-      width: min(420px, calc(100vw - 36px));
-      overflow: hidden;
-      border: 1px solid #dbdbdb;
-      border-radius: 10px;
-      background: var(--surface);
-      box-shadow: 0 18px 48px rgba(0, 0, 0, 0.14);
+    .shell {
+      width: min(1120px, calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 42px 0 56px;
     }
 
-    .post-header {
+    header {
       display: flex;
-      align-items: center;
-      gap: 10px;
-      height: 52px;
-      padding: 8px 12px;
+      align-items: end;
+      justify-content: space-between;
+      gap: 24px;
+      padding-bottom: 28px;
       border-bottom: 1px solid var(--line);
-      background: var(--surface);
     }
 
-    .avatar {
-      width: 34px;
-      height: 34px;
-      flex: 0 0 34px;
-      overflow: hidden;
-      border-radius: 50%;
-      background: #eee;
-    }
-
-    .avatar img {
-      display: block;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .profile {
-      min-width: 0;
-      flex: 1;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-
-    .username {
-      overflow: hidden;
-      color: var(--text);
-      font-size: 14px;
-      font-weight: 600;
-      line-height: 1;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .verified {
-      width: 14px;
-      height: 14px;
-      flex: 0 0 14px;
-      color: var(--blue);
-    }
-
-    .icon-button {
-      display: inline-grid;
-      place-items: center;
-      width: 28px;
-      height: 28px;
-      border: 0;
-      background: transparent;
-      color: var(--text);
-      cursor: pointer;
-    }
-
-    .icon-button svg {
-      display: block;
-      width: 24px;
-      height: 24px;
-      stroke: currentColor;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      fill: none;
-    }
-
-    .media {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 4 / 5;
-      overflow: hidden;
-      background: #f7f1e5;
-      cursor: grab;
-      touch-action: pan-y;
-      user-select: none;
-      -webkit-user-select: none;
-    }
-
-    .media.dragging {
-      cursor: grabbing;
-    }
-
-    .track {
-      display: flex;
-      height: 100%;
-      transition: transform 260ms ease;
-      will-change: transform;
-    }
-
-    .slide {
-      min-width: 100%;
-      height: 100%;
-      background: #f7f1e5;
-    }
-
-    .slide img {
-      display: block;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      pointer-events: none;
-      user-select: none;
-      -webkit-user-drag: none;
-    }
-
-    .counter {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      z-index: 3;
-      padding: 4px 8px;
-      border-radius: 999px;
-      background: rgba(0, 0, 0, 0.62);
-      color: #fff;
-      font-size: 12px;
+    h1 {
+      max-width: 760px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(34px, 6vw, 68px);
       font-weight: 500;
-      line-height: 1;
+      line-height: 0.95;
+      letter-spacing: 0;
     }
 
-    .hit {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      z-index: 2;
-      width: 33.333%;
-      border: 0;
-      background: transparent;
-      cursor: pointer;
-    }
-
-    .hit.prev {
-      left: 0;
-    }
-
-    .hit.next {
-      right: 0;
-    }
-
-    .dots {
-      display: flex;
-      justify-content: center;
-      gap: 4px;
-      height: 18px;
-      padding-top: 8px;
-      background: var(--surface);
-    }
-
-    .dot {
-      width: 6px;
-      height: 6px;
-      border: 0;
-      border-radius: 50%;
-      background: #c7c7c7;
-      cursor: pointer;
-    }
-
-    .dot.active {
-      background: var(--blue);
-    }
-
-    .actions {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      height: 40px;
-      padding: 4px 12px 8px;
-      background: var(--surface);
-    }
-
-    .actions .icon-button {
-      width: 26px;
-      height: 26px;
-    }
-
-    .actions .icon-button svg {
-      width: 25px;
-      height: 25px;
-    }
-
-    .actions .save {
-      margin-left: auto;
-    }
-
-    .likes {
-      padding: 0 12px 4px;
-      background: var(--surface);
-      color: var(--text);
-      font-size: 13px;
-      font-weight: 600;
-      line-height: 1.35;
-    }
-
-    .caption {
-      padding: 0 12px 2px;
-      background: var(--surface);
-      color: var(--text);
-      font-size: 13px;
-      line-height: 1.35;
-    }
-
-    .caption strong {
-      font-weight: 600;
-    }
-
-    .caption .more {
-      color: var(--muted);
-    }
-
-    .time {
-      padding: 4px 12px 14px;
-      background: var(--surface);
-      color: var(--muted);
-      font-size: 11px;
-      line-height: 1;
+    .eyebrow {
+      margin-bottom: 10px;
+      color: var(--teal);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
       text-transform: uppercase;
     }
 
-    @media (max-width: 520px) {
-      body {
+    .summary {
+      max-width: 300px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 22px;
+      padding-top: 28px;
+    }
+
+    .card {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      box-shadow: 0 16px 36px rgba(7, 57, 58, 0.08);
+    }
+
+    .thumb {
+      display: block;
+      width: 100%;
+      aspect-ratio: 4 / 5;
+      object-fit: cover;
+      background: #ede4d5;
+    }
+
+    .content {
+      padding: 18px;
+    }
+
+    .meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      min-height: 26px;
+      padding: 0 10px;
+      border-radius: 999px;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .status.postado {
+      background: var(--posted);
+    }
+
+    .status.aprovado {
+      background: var(--approved);
+    }
+
+    .status.em-aprovacao {
+      background: var(--pending);
+    }
+
+    .date {
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    h2 {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 29px;
+      font-weight: 500;
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .description {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 38px;
+      padding: 0 14px;
+      border: 1px solid var(--ink);
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .button.primary {
+      border-color: var(--ink);
+      background: var(--ink);
+      color: #fff;
+    }
+
+    .button.secondary {
+      border-color: var(--line);
+      color: var(--ink);
+    }
+
+    @media (max-width: 720px) {
+      .shell {
+        width: min(100vw - 24px, 420px);
+        padding: 28px 0 36px;
+      }
+
+      header {
         display: block;
-        min-height: 100vh;
-        padding: 0;
-        background: var(--surface);
       }
 
-      .post {
-        width: 100vw;
-        min-height: 100vh;
-        border: 0;
-        border-radius: 0;
-        box-shadow: none;
-      }
-
-      .post-header {
-        height: 50px;
-      }
-
-      .media {
-        width: 100vw;
+      .summary {
+        margin-top: 14px;
       }
     }
   </style>
 </head>
 <body>
-  <article class="post" aria-label="Preview do post no Instagram">
-    <header class="post-header">
-      <div class="avatar">
-        <img src="minhas-fotos/bio-silvana-rosa-desafio-sua-mentoria-em-3-dias.webp" alt="Foto de perfil de Silvana Rosa">
+  <main class="shell">
+    <header>
+      <div>
+        <p class="eyebrow">Previews Instagram</p>
+        <h1>Vitrine de carrosseis</h1>
       </div>
-
-      <div class="profile">
-        <span class="username">eu.silvanarosa</span>
-        <svg class="verified" viewBox="0 0 24 24" aria-label="Verificado">
-          <path fill="currentColor" d="M22 12l-2.1 2.4.3 3.2-3.1.7-1.6 2.8-2.9-1.3-2.9 1.3-1.6-2.8-3.1-.7.3-3.2L3 12l2.1-2.4-.3-3.2 3.1-.7 1.6-2.8 2.9 1.3 2.9-1.3 1.6 2.8 3.1.7-.3 3.2L22 12z"></path>
-          <path d="M8.3 12.2l2.3 2.3 5.1-5.1" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
-        </svg>
-      </div>
-
-      <button class="icon-button" type="button" aria-label="Mais opcoes">
-        <svg viewBox="0 0 24 24">
-          <circle cx="12" cy="5" r="1.5" fill="currentColor" stroke="none"></circle>
-          <circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"></circle>
-          <circle cx="12" cy="19" r="1.5" fill="currentColor" stroke="none"></circle>
-        </svg>
-      </button>
+      <p class="summary">Home de aprovacao dos carrosseis da Silvana Rosa, com previews individuais e status de publicacao.</p>
     </header>
 
-    <section class="media" id="media">
-      <div class="track" id="track"></div>
-      <span class="counter" id="counter">1/7</span>
-      <button class="hit prev" type="button" id="prev" aria-label="Slide anterior"></button>
-      <button class="hit next" type="button" id="next" aria-label="Proximo slide"></button>
+    <section class="grid" aria-label="Lista de carrosseis">
+      <article class="card">
+        <img class="thumb" src="carrosseis/agentes-claude/slide-01.png" alt="Capa do carrossel Agentes Claude">
+        <div class="content">
+          <div class="meta">
+            <span class="status postado">postado</span>
+            <span class="date">12/06/2026</span>
+          </div>
+          <h2>Agentes Claude</h2>
+          <p class="description">Ecossistema de agentes com alma para mentoras, criado no formato 4:5 e aprovado para publicacao.</p>
+          <div class="links">
+            <a class="button primary" href="previews/agentes-claude.html">Abrir preview</a>
+            <a class="button secondary" href="https://www.instagram.com/p/DZe1Lx5DbrO/" target="_blank" rel="noreferrer">Ver post</a>
+          </div>
+        </div>
+      </article>
     </section>
-
-    <nav class="dots" id="dots" aria-label="Navegacao dos slides"></nav>
-
-    <section class="actions" aria-label="Acoes do post">
-      <button class="icon-button" type="button" aria-label="Curtir">
-        <svg viewBox="0 0 24 24">
-          <path d="M20.8 4.6c-1.8-1.8-4.7-1.8-6.5 0L12 6.9 9.7 4.6c-1.8-1.8-4.7-1.8-6.5 0s-1.8 4.7 0 6.5L12 20l8.8-8.9c1.8-1.8 1.8-4.7 0-6.5z"></path>
-        </svg>
-      </button>
-      <button class="icon-button" type="button" aria-label="Comentar">
-        <svg viewBox="0 0 24 24">
-          <path d="M21 11.5a8.4 8.4 0 0 1-8.7 8.3 9.7 9.7 0 0 1-4.3-1l-5 1.2 1.3-4.4a8.2 8.2 0 0 1-.9-3.8A8.4 8.4 0 0 1 12 3.5a8.4 8.4 0 0 1 9 8z"></path>
-        </svg>
-      </button>
-      <button class="icon-button" type="button" aria-label="Compartilhar">
-        <svg viewBox="0 0 24 24">
-          <path d="M22 3L9.5 13.2"></path>
-          <path d="M22 3l-4.2 18-6.1-7.4L3 10.6 22 3z"></path>
-        </svg>
-      </button>
-      <button class="icon-button save" type="button" aria-label="Salvar">
-        <svg viewBox="0 0 24 24">
-          <path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"></path>
-        </svg>
-      </button>
-    </section>
-
-    <div class="likes">6 curtidas</div>
-    <p class="caption">
-      <strong>eu.silvanarosa</strong>
-      Seu ecossistema de Agentes Claude, feito com a sua alma.
-      Comenta <strong>AGENTES</strong> para criar o seu.
-      <span class="more">mais</span>
-    </p>
-    <div class="time">Ha 3 horas</div>
-  </article>
-
-  <script>
-    const slides = [
-      "carrosseis/agentes-claude/slide-01.png",
-      "carrosseis/agentes-claude/slide-02.png",
-      "carrosseis/agentes-claude/slide-03.png",
-      "carrosseis/agentes-claude/slide-04.png",
-      "carrosseis/agentes-claude/slide-05.png",
-      "carrosseis/agentes-claude/slide-06.png",
-      "carrosseis/agentes-claude/slide-07.png"
-    ];
-
-    const track = document.getElementById("track");
-    const dots = document.getElementById("dots");
-    const counter = document.getElementById("counter");
-    const prev = document.getElementById("prev");
-    const next = document.getElementById("next");
-    const media = document.getElementById("media");
-    let current = 0;
-    let startX = 0;
-    let currentX = 0;
-    let dragging = false;
-    let didDrag = false;
-
-    slides.forEach((src, index) => {
-      const slide = document.createElement("div");
-      slide.className = "slide";
-
-      const img = document.createElement("img");
-      img.src = src;
-      img.alt = `Slide ${index + 1}`;
-
-      slide.appendChild(img);
-      track.appendChild(slide);
-
-      const dot = document.createElement("button");
-      dot.className = "dot";
-      dot.type = "button";
-      dot.setAttribute("aria-label", `Ir para slide ${index + 1}`);
-      dot.addEventListener("click", () => {
-        current = index;
-        render();
-      });
-      dots.appendChild(dot);
-    });
-
-    function render() {
-      track.style.transition = "transform 260ms ease";
-      track.style.transform = `translateX(${-current * 100}%)`;
-      counter.textContent = `${current + 1}/${slides.length}`;
-      [...dots.children].forEach((dot, index) => {
-        dot.classList.toggle("active", index === current);
-      });
-      prev.disabled = current === 0;
-      next.disabled = current === slides.length - 1;
-    }
-
-    function go(delta) {
-      current = Math.max(0, Math.min(slides.length - 1, current + delta));
-      render();
-    }
-
-    function handleTap(delta) {
-      if (didDrag) {
-        didDrag = false;
-        return;
-      }
-      go(delta);
-    }
-
-    prev.addEventListener("click", () => handleTap(-1));
-    next.addEventListener("click", () => handleTap(1));
-
-    media.addEventListener("pointerdown", (event) => {
-      dragging = true;
-      didDrag = false;
-      startX = event.clientX;
-      currentX = event.clientX;
-      track.style.transition = "none";
-      media.classList.add("dragging");
-      media.setPointerCapture(event.pointerId);
-    });
-
-    media.addEventListener("pointermove", (event) => {
-      if (!dragging) return;
-      currentX = event.clientX;
-      const distance = currentX - startX;
-      if (Math.abs(distance) > 8) {
-        didDrag = true;
-      }
-      const width = media.clientWidth || 1;
-      const edgeResistance =
-        (current === 0 && distance > 0) || (current === slides.length - 1 && distance < 0)
-          ? 0.28
-          : 1;
-      const offset = (distance * edgeResistance / width) * 100;
-      track.style.transform = `translateX(${(-current * 100) + offset}%)`;
-    });
-
-    function finishDrag(event) {
-      if (!dragging) return;
-      const distance = currentX - startX;
-      dragging = false;
-      media.classList.remove("dragging");
-      if (event.pointerId !== undefined && media.hasPointerCapture(event.pointerId)) {
-        media.releasePointerCapture(event.pointerId);
-      }
-      if (Math.abs(distance) > 45) {
-        go(distance < 0 ? 1 : -1);
-      } else {
-        render();
-      }
-    }
-
-    media.addEventListener("pointerup", finishDrag);
-    media.addEventListener("pointercancel", finishDrag);
-
-    render();
-  </script>
+  </main>
 </body>
 </html>
