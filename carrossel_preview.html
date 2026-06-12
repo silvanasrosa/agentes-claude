@@ -118,6 +118,14 @@
       aspect-ratio: 4 / 5;
       overflow: hidden;
       background: #f7f1e5;
+      cursor: grab;
+      touch-action: pan-y;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .media.dragging {
+      cursor: grabbing;
     }
 
     .track {
@@ -138,6 +146,9 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-drag: none;
     }
 
     .counter {
@@ -364,7 +375,9 @@
     const media = document.getElementById("media");
     let current = 0;
     let startX = 0;
+    let currentX = 0;
     let dragging = false;
+    let didDrag = false;
 
     slides.forEach((src, index) => {
       const slide = document.createElement("div");
@@ -389,6 +402,7 @@
     });
 
     function render() {
+      track.style.transition = "transform 260ms ease";
       track.style.transform = `translateX(${-current * 100}%)`;
       counter.textContent = `${current + 1}/${slides.length}`;
       [...dots.children].forEach((dot, index) => {
@@ -403,23 +417,60 @@
       render();
     }
 
-    prev.addEventListener("click", () => go(-1));
-    next.addEventListener("click", () => go(1));
+    function handleTap(delta) {
+      if (didDrag) {
+        didDrag = false;
+        return;
+      }
+      go(delta);
+    }
+
+    prev.addEventListener("click", () => handleTap(-1));
+    next.addEventListener("click", () => handleTap(1));
 
     media.addEventListener("pointerdown", (event) => {
       dragging = true;
+      didDrag = false;
       startX = event.clientX;
+      currentX = event.clientX;
+      track.style.transition = "none";
+      media.classList.add("dragging");
       media.setPointerCapture(event.pointerId);
     });
 
-    media.addEventListener("pointerup", (event) => {
+    media.addEventListener("pointermove", (event) => {
       if (!dragging) return;
-      const distance = event.clientX - startX;
+      currentX = event.clientX;
+      const distance = currentX - startX;
+      if (Math.abs(distance) > 8) {
+        didDrag = true;
+      }
+      const width = media.clientWidth || 1;
+      const edgeResistance =
+        (current === 0 && distance > 0) || (current === slides.length - 1 && distance < 0)
+          ? 0.28
+          : 1;
+      const offset = (distance * edgeResistance / width) * 100;
+      track.style.transform = `translateX(${(-current * 100) + offset}%)`;
+    });
+
+    function finishDrag(event) {
+      if (!dragging) return;
+      const distance = currentX - startX;
+      dragging = false;
+      media.classList.remove("dragging");
+      if (event.pointerId !== undefined && media.hasPointerCapture(event.pointerId)) {
+        media.releasePointerCapture(event.pointerId);
+      }
       if (Math.abs(distance) > 45) {
         go(distance < 0 ? 1 : -1);
+      } else {
+        render();
       }
-      dragging = false;
-    });
+    }
+
+    media.addEventListener("pointerup", finishDrag);
+    media.addEventListener("pointercancel", finishDrag);
 
     render();
   </script>
