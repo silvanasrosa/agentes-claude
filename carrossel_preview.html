@@ -3,17 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Carrossel - Agentes Claude | Preview</title>
+  <title>Preview Instagram - Agentes Claude</title>
   <style>
-    @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=DM+Sans:wght@400;500;600&display=swap");
-
     :root {
-      --tiffany: #4EC8C4;
-      --teal-deep: #0E4D4A;
-      --cream: #F7F1E5;
-      --cream-border: #E8DEC9;
-      --ink: #10302E;
-      --rose: #ff315d;
+      --page: #d8d3c8;
+      --surface: #fff;
+      --line: #efefef;
+      --text: #111;
+      --muted: #737373;
+      --blue: #0095f6;
     }
 
     * {
@@ -27,28 +25,28 @@
       display: flex;
       justify-content: center;
       padding: 38px 18px;
-      background: #d8d3c8;
-      color: var(--ink);
-      font-family: "DM Sans", sans-serif;
-      border-top: 8px solid #51352e;
+      background: var(--page);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
 
-    .ig-frame {
+    .post {
       width: min(420px, calc(100vw - 36px));
-      align-self: flex-start;
       overflow: hidden;
-      border-radius: 14px;
-      background: #fff;
-      box-shadow: 0 20px 52px rgba(16, 48, 46, 0.22);
+      border: 1px solid #dbdbdb;
+      border-radius: 10px;
+      background: var(--surface);
+      box-shadow: 0 18px 48px rgba(0, 0, 0, 0.14);
     }
 
-    .ig-header {
+    .post-header {
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 12px 14px;
-      border-bottom: 1px solid #eee;
-      background: #fff;
+      height: 52px;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--line);
+      background: var(--surface);
     }
 
     .avatar {
@@ -56,9 +54,8 @@
       height: 34px;
       flex: 0 0 34px;
       overflow: hidden;
-      border: 2px solid var(--teal-deep);
       border-radius: 50%;
-      background: var(--teal-deep);
+      background: #eee;
     }
 
     .avatar img {
@@ -70,38 +67,60 @@
 
     .profile {
       min-width: 0;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 5px;
     }
 
-    .profile strong {
+    .username {
+      overflow: hidden;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .verified {
+      width: 14px;
+      height: 14px;
+      flex: 0 0 14px;
+      color: var(--blue);
+    }
+
+    .icon-button {
+      display: inline-grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      border: 0;
+      background: transparent;
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    .icon-button svg {
       display: block;
-      color: #161616;
-      font-size: 13px;
-      font-weight: 700;
-      line-height: 1.15;
+      width: 24px;
+      height: 24px;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
     }
 
-    .profile small {
-      display: block;
-      margin-top: 2px;
-      color: #888;
-      font-size: 11px;
-      line-height: 1.15;
-    }
-
-    .carousel-viewport {
+    .media {
       position: relative;
       width: 100%;
       aspect-ratio: 4 / 5;
       overflow: hidden;
-      background: var(--cream);
-      cursor: grab;
+      background: #f7f1e5;
     }
 
-    .carousel-viewport:active {
-      cursor: grabbing;
-    }
-
-    .carousel-track {
+    .track {
       display: flex;
       height: 100%;
       transition: transform 260ms ease;
@@ -111,7 +130,7 @@
     .slide {
       min-width: 100%;
       height: 100%;
-      background: var(--cream);
+      background: #f7f1e5;
     }
 
     .slide img {
@@ -121,146 +140,209 @@
       object-fit: cover;
     }
 
-    .nav {
+    .counter {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 3;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.62);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 1;
+    }
+
+    .hit {
       position: absolute;
       top: 0;
       bottom: 0;
       z-index: 2;
-      width: 58px;
+      width: 33.333%;
       border: 0;
       background: transparent;
-      color: rgba(16, 48, 46, 0.32);
       cursor: pointer;
-      font-size: 42px;
-      line-height: 1;
     }
 
-    .nav.prev {
+    .hit.prev {
       left: 0;
-      background: linear-gradient(to right, rgba(247, 241, 229, 0.32), transparent);
     }
 
-    .nav.next {
+    .hit.next {
       right: 0;
-      background: linear-gradient(to left, rgba(247, 241, 229, 0.32), transparent);
     }
 
-    .nav:disabled {
-      cursor: default;
-      opacity: 0.12;
-    }
-
-    .ig-dots {
+    .dots {
       display: flex;
       justify-content: center;
-      gap: 6px;
-      padding: 11px 14px 8px;
-      background: #fff;
+      gap: 4px;
+      height: 18px;
+      padding-top: 8px;
+      background: var(--surface);
     }
 
-    .ig-dots button {
+    .dot {
       width: 6px;
       height: 6px;
       border: 0;
       border-radius: 50%;
-      background: #ccc;
+      background: #c7c7c7;
       cursor: pointer;
     }
 
-    .ig-dots button.active {
-      width: 7px;
-      height: 7px;
-      background: var(--teal-deep);
+    .dot.active {
+      background: var(--blue);
     }
 
-    .ig-actions {
+    .actions {
       display: flex;
       align-items: center;
-      gap: 16px;
-      padding: 6px 14px 4px;
-      background: #fff;
-      color: #111;
+      gap: 12px;
+      height: 40px;
+      padding: 4px 12px 8px;
+      background: var(--surface);
     }
 
-    .ig-actions button {
-      display: inline-grid;
-      place-items: center;
-      width: 22px;
-      height: 22px;
-      border: 0;
-      background: transparent;
-      color: inherit;
-      cursor: pointer;
-      font-size: 21px;
-      line-height: 1;
+    .actions .icon-button {
+      width: 26px;
+      height: 26px;
     }
 
-    .ig-actions .save {
+    .actions .icon-button svg {
+      width: 25px;
+      height: 25px;
+    }
+
+    .actions .save {
       margin-left: auto;
-      color: var(--rose);
     }
 
-    .ig-caption {
-      padding: 4px 14px 16px;
-      background: #fff;
-      color: #222;
-      font-size: 12px;
-      line-height: 1.5;
+    .likes {
+      padding: 0 12px 4px;
+      background: var(--surface);
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.35;
     }
 
-    .ig-caption b {
-      font-weight: 700;
+    .caption {
+      padding: 0 12px 2px;
+      background: var(--surface);
+      color: var(--text);
+      font-size: 13px;
+      line-height: 1.35;
     }
 
-    .ig-caption .tag {
-      color: var(--teal-deep);
-      font-weight: 700;
+    .caption strong {
+      font-weight: 600;
     }
 
-    .empty {
-      display: grid;
-      place-items: center;
-      height: 100%;
-      padding: 24px;
-      color: rgba(16, 48, 46, 0.68);
-      text-align: center;
-      font-size: 14px;
-      line-height: 1.45;
+    .caption .more {
+      color: var(--muted);
+    }
+
+    .time {
+      padding: 4px 12px 14px;
+      background: var(--surface);
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 520px) {
+      body {
+        display: block;
+        min-height: 100vh;
+        padding: 0;
+        background: var(--surface);
+      }
+
+      .post {
+        width: 100vw;
+        min-height: 100vh;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+      }
+
+      .post-header {
+        height: 50px;
+      }
+
+      .media {
+        width: 100vw;
+      }
     }
   </style>
 </head>
 <body>
-  <article class="ig-frame" aria-label="Preview do carrossel no Instagram">
-    <header class="ig-header">
+  <article class="post" aria-label="Preview do post no Instagram">
+    <header class="post-header">
       <div class="avatar">
         <img src="minhas-fotos/bio-silvana-rosa-desafio-sua-mentoria-em-3-dias.webp" alt="Foto de perfil de Silvana Rosa">
       </div>
+
       <div class="profile">
-        <strong>eu.silvanarosa</strong>
-        <small>Mentora de Negocios</small>
+        <span class="username">eu.silvanarosa</span>
+        <svg class="verified" viewBox="0 0 24 24" aria-label="Verificado">
+          <path fill="currentColor" d="M22 12l-2.1 2.4.3 3.2-3.1.7-1.6 2.8-2.9-1.3-2.9 1.3-1.6-2.8-3.1-.7.3-3.2L3 12l2.1-2.4-.3-3.2 3.1-.7 1.6-2.8 2.9 1.3 2.9-1.3 1.6 2.8 3.1.7-.3 3.2L22 12z"></path>
+          <path d="M8.3 12.2l2.3 2.3 5.1-5.1" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+        </svg>
       </div>
+
+      <button class="icon-button" type="button" aria-label="Mais opcoes">
+        <svg viewBox="0 0 24 24">
+          <circle cx="12" cy="5" r="1.5" fill="currentColor" stroke="none"></circle>
+          <circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"></circle>
+          <circle cx="12" cy="19" r="1.5" fill="currentColor" stroke="none"></circle>
+        </svg>
+      </button>
     </header>
 
-    <section class="carousel-viewport" id="viewport">
-      <div class="carousel-track" id="track"></div>
-      <button class="nav prev" type="button" id="prev" aria-label="Slide anterior">&lsaquo;</button>
-      <button class="nav next" type="button" id="next" aria-label="Proximo slide">&rsaquo;</button>
+    <section class="media" id="media">
+      <div class="track" id="track"></div>
+      <span class="counter" id="counter">1/7</span>
+      <button class="hit prev" type="button" id="prev" aria-label="Slide anterior"></button>
+      <button class="hit next" type="button" id="next" aria-label="Proximo slide"></button>
     </section>
 
-    <nav class="ig-dots" id="dots" aria-label="Navegacao dos slides"></nav>
+    <nav class="dots" id="dots" aria-label="Navegacao dos slides"></nav>
 
-    <div class="ig-actions" aria-hidden="true">
-      <button type="button">♡</button>
-      <button type="button">💬</button>
-      <button type="button">↪</button>
-      <button class="save" type="button">▰</button>
-    </div>
+    <section class="actions" aria-label="Acoes do post">
+      <button class="icon-button" type="button" aria-label="Curtir">
+        <svg viewBox="0 0 24 24">
+          <path d="M20.8 4.6c-1.8-1.8-4.7-1.8-6.5 0L12 6.9 9.7 4.6c-1.8-1.8-4.7-1.8-6.5 0s-1.8 4.7 0 6.5L12 20l8.8-8.9c1.8-1.8 1.8-4.7 0-6.5z"></path>
+        </svg>
+      </button>
+      <button class="icon-button" type="button" aria-label="Comentar">
+        <svg viewBox="0 0 24 24">
+          <path d="M21 11.5a8.4 8.4 0 0 1-8.7 8.3 9.7 9.7 0 0 1-4.3-1l-5 1.2 1.3-4.4a8.2 8.2 0 0 1-.9-3.8A8.4 8.4 0 0 1 12 3.5a8.4 8.4 0 0 1 9 8z"></path>
+        </svg>
+      </button>
+      <button class="icon-button" type="button" aria-label="Compartilhar">
+        <svg viewBox="0 0 24 24">
+          <path d="M22 3L9.5 13.2"></path>
+          <path d="M22 3l-4.2 18-6.1-7.4L3 10.6 22 3z"></path>
+        </svg>
+      </button>
+      <button class="icon-button save" type="button" aria-label="Salvar">
+        <svg viewBox="0 0 24 24">
+          <path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"></path>
+        </svg>
+      </button>
+    </section>
 
-    <p class="ig-caption">
-      <b>eu.silvanarosa</b>
+    <div class="likes">6 curtidas</div>
+    <p class="caption">
+      <strong>eu.silvanarosa</strong>
       Seu ecossistema de Agentes Claude, feito com a sua alma.
-      <span class="tag">Comenta AGENTES</span> 💌
+      Comenta <strong>AGENTES</strong> para criar o seu.
+      <span class="more">mais</span>
     </p>
+    <div class="time">Ha 3 horas</div>
   </article>
 
   <script>
@@ -276,43 +358,39 @@
 
     const track = document.getElementById("track");
     const dots = document.getElementById("dots");
+    const counter = document.getElementById("counter");
     const prev = document.getElementById("prev");
     const next = document.getElementById("next");
-    const viewport = document.getElementById("viewport");
+    const media = document.getElementById("media");
     let current = 0;
     let startX = 0;
-    let isDragging = false;
+    let dragging = false;
 
-    function mountSlides() {
-      if (!slides.length) {
-        track.innerHTML = '<div class="slide"><div class="empty">Nenhum slide encontrado em carrosseis/agentes-claude.</div></div>';
-        return;
-      }
+    slides.forEach((src, index) => {
+      const slide = document.createElement("div");
+      slide.className = "slide";
 
-      slides.forEach((src, index) => {
-        const slide = document.createElement("div");
-        slide.className = "slide";
+      const img = document.createElement("img");
+      img.src = src;
+      img.alt = `Slide ${index + 1}`;
 
-        const img = document.createElement("img");
-        img.src = src;
-        img.alt = `Slide ${index + 1}`;
+      slide.appendChild(img);
+      track.appendChild(slide);
 
-        slide.appendChild(img);
-        track.appendChild(slide);
-
-        const dot = document.createElement("button");
-        dot.type = "button";
-        dot.setAttribute("aria-label", `Ir para slide ${index + 1}`);
-        dot.addEventListener("click", () => {
-          current = index;
-          render();
-        });
-        dots.appendChild(dot);
+      const dot = document.createElement("button");
+      dot.className = "dot";
+      dot.type = "button";
+      dot.setAttribute("aria-label", `Ir para slide ${index + 1}`);
+      dot.addEventListener("click", () => {
+        current = index;
+        render();
       });
-    }
+      dots.appendChild(dot);
+    });
 
     function render() {
       track.style.transform = `translateX(${-current * 100}%)`;
+      counter.textContent = `${current + 1}/${slides.length}`;
       [...dots.children].forEach((dot, index) => {
         dot.classList.toggle("active", index === current);
       });
@@ -328,22 +406,21 @@
     prev.addEventListener("click", () => go(-1));
     next.addEventListener("click", () => go(1));
 
-    viewport.addEventListener("pointerdown", (event) => {
-      isDragging = true;
+    media.addEventListener("pointerdown", (event) => {
+      dragging = true;
       startX = event.clientX;
-      viewport.setPointerCapture(event.pointerId);
+      media.setPointerCapture(event.pointerId);
     });
 
-    viewport.addEventListener("pointerup", (event) => {
-      if (!isDragging) return;
+    media.addEventListener("pointerup", (event) => {
+      if (!dragging) return;
       const distance = event.clientX - startX;
       if (Math.abs(distance) > 45) {
         go(distance < 0 ? 1 : -1);
       }
-      isDragging = false;
+      dragging = false;
     });
 
-    mountSlides();
     render();
   </script>
 </body>
